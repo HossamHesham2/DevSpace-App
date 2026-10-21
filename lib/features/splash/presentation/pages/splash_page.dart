@@ -1,26 +1,60 @@
+import 'dart:async';
+
 import 'package:dev_space/core/constants/app_assets.dart';
 import 'package:dev_space/core/constants/app_constants.dart';
 import 'package:dev_space/core/extensions/color_extension.dart';
+import 'package:dev_space/core/router/route_names.dart';
 import 'package:dev_space/core/widgets/d_scaffold.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 
-class SplashPage extends StatelessWidget {
+class SplashPage extends StatefulWidget {
   const SplashPage({super.key});
+
+  @override
+  State<SplashPage> createState() => _SplashPageState();
+}
+
+class _SplashPageState extends State<SplashPage> {
+  Timer? _navigationTimer;
+
+  @override
+  void initState() {
+    super.initState();
+
+    _navigationTimer = Timer(
+      const Duration(milliseconds: 5000),
+          () {
+        if (!mounted) return;
+
+        context.goNamed(RouteNames.onboarding);
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    _navigationTimer?.cancel();
+    super.dispose();
+  }
 
   @override
   Widget build(BuildContext context) {
     final appColors = Theme.of(context).colorScheme;
     final appText = Theme.of(context).textTheme;
+
     return DScaffold(
       body: Column(
         children: [
+          // ================= HEADER =================
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
+              // Secure Link
               Container(
-                padding: EdgeInsets.all(8),
+                padding: EdgeInsets.all(8.r),
                 decoration: BoxDecoration(
                   color: appColors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16.r),
@@ -37,77 +71,97 @@ class SplashPage extends StatelessWidget {
                       ),
                     ),
                     SizedBox(width: 10.w),
-                    Text("SECURE LINK", style: appText.labelMedium),
+                    Text(
+                      "SECURE LINK",
+                      style: appText.labelMedium,
+                    ),
                   ],
                 ),
               ),
+
+              // Production Badge
               Container(
-                padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                padding: EdgeInsets.symmetric(
+                  horizontal: 16.w,
+                  vertical: 10.h,
+                ),
                 decoration: BoxDecoration(
                   color: appColors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16.r),
                 ),
-
                 child: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
                     SvgPicture.asset(
                       AppSvgs.logoCode,
+                      width: 15.r,
+                      height: 15.r,
                       colorFilter: ColorFilter.mode(
                         appColors.onSurface,
                         BlendMode.srcIn,
                       ),
-                      width: 15.r,
                     ),
                     SizedBox(width: 10.w),
-                    Text("PROD", style: appText.labelMedium),
+                    Text(
+                      "PROD",
+                      style: appText.labelMedium,
+                    ),
                   ],
                 ),
               ),
             ],
           ),
-          Spacer(),
+
+          const Spacer(),
+
+          // ================= LOGO =================
           Container(
             padding: EdgeInsets.all(14.r),
             decoration: BoxDecoration(
               color: appColors.surface,
               borderRadius: BorderRadius.circular(24.r),
-              border: Border.all(color: appColors.outlineVariant, width: 2),
+              border: Border.all(
+                color: appColors.outlineVariant,
+                width: 2,
+              ),
               boxShadow: [
                 BoxShadow(
                   color: appColors.primary.withValues(alpha: 0.25),
-                  blurRadius: 14,
-                  spreadRadius: 2,
-                  offset: const Offset(0, 4),
+                  blurRadius: 24.r,
+                  spreadRadius: 2.r,
+                  offset: Offset(0, 4.h),
                 ),
               ],
             ),
             child: Container(
-              width: 90.w,
-              height: 90.h,
+              width: 90.r,
+              height: 90.r,
               decoration: BoxDecoration(
                 color: appColors.surfaceContainer,
                 borderRadius: BorderRadius.circular(18.r),
               ),
               child: Stack(
                 children: [
+                  // Logo
                   Center(
                     child: SvgPicture.asset(
                       AppSvgs.logoCode,
-                      width: 35.w,
-                      height: 35.h,
+                      width: 35.r,
+                      height: 35.r,
                     ),
                   ),
 
                   // Purple Dot
                   Positioned(
-                    top: 10.h,
-                    right: 10.w,
+                    top: 10.r,
+                    right: 10.r,
                     child: Container(
                       width: 9.r,
                       height: 9.r,
                       decoration: BoxDecoration(
-                        color: appColors.primary.withValues(alpha: 0.5),
+                        color: appColors.primary.withValues(
+                          alpha: 0.5,
+                        ),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -116,52 +170,78 @@ class SplashPage extends StatelessWidget {
               ),
             ),
           ),
+
+          SizedBox(height: 20.h),
+
+          // ================= APP NAME =================
+          Text(
+            AppConstants.appName,
+            style: appText.headlineLarge,
+            textAlign: TextAlign.center,
+          ),
+
           SizedBox(height: 10.h),
-          Text(AppConstants.appName, style: appText.headlineLarge),
-          SizedBox(height: 10.h),
+
+          // ================= SUBTITLE =================
           Text(
             "Your space. Your code. Your community.",
             style: appText.bodyLarge,
+            textAlign: TextAlign.center,
           ),
 
-          Spacer(),
+          const Spacer(),
+
+          // ================= LOADING =================
           SizedBox(
             width: 20.r,
             height: 20.r,
             child: CircularProgressIndicator(
-              strokeWidth: 4,
+              strokeWidth: 3.r,
+              strokeCap: StrokeCap.round,
               color: appColors.primary,
             ),
           ),
 
           SizedBox(height: 20.h),
+
+          // ================= VERSION =================
           Container(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+            padding: EdgeInsets.symmetric(
+              horizontal: 16.w,
+              vertical: 10.h,
+            ),
             decoration: BoxDecoration(
               color: appColors.surfaceContainer,
               borderRadius: BorderRadius.circular(16.r),
             ),
-
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text("v1.0.0", style: appText.labelSmall),
-                SizedBox(width: 5.w),
+                Text(
+                  "v1.0.0",
+                  style: appText.labelSmall,
+                ),
+
+                SizedBox(width: 8.w),
+
                 Container(
                   width: 5.r,
                   height: 5.r,
                   decoration: BoxDecoration(
                     color: appColors.onSurface,
-                    borderRadius: BorderRadius.circular(16.r),
+                    shape: BoxShape.circle,
                   ),
                 ),
 
-                SizedBox(width: 5.w),
-                Text("Production Ready", style: appText.labelMedium),
+                SizedBox(width: 8.w),
+
+                Text(
+                  "Production Ready",
+                  style: appText.labelMedium,
+                ),
               ],
             ),
           ),
-
         ],
       ),
     );

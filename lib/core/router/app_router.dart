@@ -1,6 +1,11 @@
-﻿import 'package:dev_space/features/splash/presentation/pages/splash_page.dart';
-import 'package:go_router/go_router.dart';
+﻿import 'package:dev_space/core/router/app_transitions.dart';
 import 'package:dev_space/core/router/route_names.dart';
+import 'package:dev_space/features/auth/presentation/pages/auth_page.dart';
+import 'package:dev_space/features/auth/presentation/pages/login_page.dart';
+import 'package:dev_space/features/auth/presentation/pages/register_page.dart';
+import 'package:dev_space/features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:dev_space/features/splash/presentation/pages/splash_page.dart';
+import 'package:go_router/go_router.dart';
 
 class AppRouter {
   AppRouter._();
@@ -12,7 +17,34 @@ class AppRouter {
       GoRoute(
         path: RouteNames.splash,
         name: RouteNames.splash,
-        builder: (context, state) => SplashPage(),
+        pageBuilder: (context, state) =>
+            AppTransitions.fade(state: state, child: const SplashPage()),
+      ),
+      GoRoute(
+        path: RouteNames.onboarding,
+        name: RouteNames.onboarding,
+        pageBuilder: (context, state) => AppTransitions.slideFade(
+          state: state,
+          child: const OnboardingPage(),
+        ),
+      ),
+      GoRoute(
+        path: RouteNames.auth,
+        name: RouteNames.auth,
+        pageBuilder: (context, state) =>
+            AppTransitions.fade(state: state, child: const AuthPage()),
+      ),
+      GoRoute(
+        path: RouteNames.login,
+        name: RouteNames.login,
+        pageBuilder: (context, state) =>
+            AppTransitions.slide(state: state, child: const LoginPage()),
+      ),
+      GoRoute(
+        path: RouteNames.register,
+        name: RouteNames.register,
+        pageBuilder: (context, state) =>
+            AppTransitions.slide(state: state, child: const RegisterPage()),
       ),
     ],
   );

@@ -5,7 +5,7 @@ class AppTextTheme {
   AppTextTheme._();
 
   static TextTheme get light {
-    return GoogleFonts.interTextTheme(
+    return GoogleFonts.jetBrainsMonoTextTheme(
       const TextTheme(
         displayLarge: TextStyle(
           fontSize: 57,
