@@ -39,7 +39,7 @@ $folders = @(
   "lib/features/$FeatureName/domain/usecases",
 
   "lib/features/$FeatureName/presentation",
-  "lib/features/$FeatureName/presentation/bloc",
+  "lib/features/$FeatureName/presentation/provider",
   "lib/features/$FeatureName/presentation/pages",
   "lib/features/$FeatureName/presentation/widgets"
 )
@@ -87,42 +87,6 @@ $files["lib/features/$FeatureName/domain/repositories/${FeatureName}_repository.
 abstract class ${FeatureClassName}Repository {}
 "@
 
-$files["lib/features/$FeatureName/presentation/bloc/${FeatureName}_bloc.dart"] = @"
-import 'package:flutter_bloc/flutter_bloc.dart';
-
-import '${FeatureName}_event.dart';
-import '${FeatureName}_state.dart';
-
-class ${FeatureClassName}Bloc
-    extends Bloc<${FeatureClassName}Event, ${FeatureClassName}State> {
-  ${FeatureClassName}Bloc() : super(${FeatureClassName}Initial()) {
-    on<${FeatureClassName}Event>(_onEvent);
-  }
-
-  void _onEvent(
-    ${FeatureClassName}Event event,
-    Emitter<${FeatureClassName}State> emit,
-  ) {}
-}
-"@
-
-$files["lib/features/$FeatureName/presentation/bloc/${FeatureName}_event.dart"] = @"
-abstract class ${FeatureClassName}Event {}
-
-class ${FeatureClassName}Started extends ${FeatureClassName}Event {}
-"@
-
-$files["lib/features/$FeatureName/presentation/bloc/${FeatureName}_state.dart"] = @"
-abstract class ${FeatureClassName}State {}
-
-class ${FeatureClassName}Initial extends ${FeatureClassName}State {}
-
-class ${FeatureClassName}Loading extends ${FeatureClassName}State {}
-
-class ${FeatureClassName}Success extends ${FeatureClassName}State {}
-
-class ${FeatureClassName}Error extends ${FeatureClassName}State {}
-"@
 
 # ---------------------------------------------------------
 #  Create files
@@ -162,7 +126,7 @@ Write-Host "   |   |-- entities" -ForegroundColor Gray
 Write-Host "   |   |-- repositories" -ForegroundColor Gray
 Write-Host "   |   '-- usecases" -ForegroundColor Gray
 Write-Host "   '-- presentation" -ForegroundColor DarkYellow
-Write-Host "       |-- bloc" -ForegroundColor Gray
+Write-Host "       |-- Provider" -ForegroundColor Gray
 Write-Host "       |-- pages" -ForegroundColor Gray
 Write-Host "       '-- widgets" -ForegroundColor Gray
 Write-Host ""

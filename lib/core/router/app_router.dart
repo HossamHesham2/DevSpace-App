@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+﻿import 'package:dev_space/features/splash/presentation/pages/splash_page.dart';
 import 'package:go_router/go_router.dart';
 import 'package:dev_space/core/router/route_names.dart';
 
@@ -6,19 +6,14 @@ class AppRouter {
   AppRouter._();
 
   static final GoRouter router = GoRouter(
-    initialLocation: RouteNames.login,
+    initialLocation: RouteNames.splash,
     debugLogDiagnostics: true,
     routes: [
       GoRoute(
-        path: RouteNames.login,
-        name: RouteNames.login,
-        builder: (context, state) => const Scaffold(
-          body: Center(child: Text('Login Screen')),
-        ),
+        path: RouteNames.splash,
+        name: RouteNames.splash,
+        builder: (context, state) => SplashPage(),
       ),
     ],
-    errorBuilder: (context, state) => const Scaffold(
-      body: Center(child: Text('No Route Found')),
-    ),
   );
 }
