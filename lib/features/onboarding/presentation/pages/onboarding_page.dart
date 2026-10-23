@@ -1,5 +1,6 @@
 import 'package:dev_space/core/constants/app_assets.dart';
 import 'package:dev_space/core/constants/app_constants.dart';
+import 'package:dev_space/core/helpers/prefs_helper.dart';
 import 'package:dev_space/core/router/route_names.dart';
 import 'package:dev_space/core/widgets/d_scaffold.dart';
 import 'package:dev_space/features/onboarding/data/models/onboarding_model.dart';
@@ -63,8 +64,17 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  void _finishOnboarding() {
-    context.goNamed(RouteNames.auth);
+  Future<void> _finishOnboarding() async {
+    final saved = await PrefsHelper.instance.setBool(
+      AppConstants.onboardingCompleted,
+      true,
+    );
+
+    if (!mounted) return;
+
+    if (saved) {
+      context.goNamed(RouteNames.auth);
+    }
   }
 
   @override

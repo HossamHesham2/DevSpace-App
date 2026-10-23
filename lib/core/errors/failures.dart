@@ -1,5 +1,13 @@
-﻿abstract class Failure {}
+abstract class Failure {
+  final String errorMessage;
 
-class ServerFailure extends Failure {}
+  new({required this.errorMessage});
+}
 
-class CacheFailure extends Failure {}
+class ServerFailure extends Failure {
+  new({required super.errorMessage});
+}
+
+class CacheFailure extends Failure {
+  new({required super.errorMessage});
+}

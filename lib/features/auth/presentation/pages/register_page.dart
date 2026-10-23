@@ -1,12 +1,16 @@
 import 'package:dev_space/core/constants/app_assets.dart';
 import 'package:dev_space/core/helpers/validators.dart';
 import 'package:dev_space/core/router/route_names.dart';
+import 'package:dev_space/core/widgets/app_snackbar.dart';
 import 'package:dev_space/core/widgets/custom_text_field.dart';
 import 'package:dev_space/core/widgets/primary_button.dart';
 import 'package:dev_space/core/widgets/secondary_button.dart';
+import 'package:dev_space/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:dev_space/features/auth/presentation/cubit/auth_state.dart';
 import 'package:dev_space/features/auth/presentation/widgets/auth_page_layout.dart';
 import 'package:dev_space/features/auth/presentation/widgets/password_strength_indicator.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -32,6 +36,7 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _obscureConfirmPassword = true;
   bool _acceptedTerms = false;
   bool _showTermsError = false;
+  bool _isLoading = false;
 
   @override
   void dispose() {
@@ -79,12 +84,15 @@ class _RegisterPageState extends State<RegisterPage> {
     }
 
     if (!fieldsValid || !termsValid) return;
-
+    context.read<AuthCubit>().signUp(
+      fullName: _fullNameController.text.trim(),
+      email: _emailController.text.trim(),
+      password: _passwordController.text,
+    );
   }
 
   void _continueWithGitHub() {
     FocusScope.of(context).unfocus();
-
   }
 
   void _goToLogin() {
@@ -100,11 +108,31 @@ class _RegisterPageState extends State<RegisterPage> {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
 
-    return AuthPageLayout(
+    return BlocListener<AuthCubit, AuthState>(
+      listener: (context, state) {
+        setState(() {
+          _isLoading = state is AuthLoading;
+        });
+
+        if (state is AuthError) {
+          AppSnackBar.error(
+            context,
+            state.message,
+            title: 'Sign Up failed',
+          );
+        } else if (state is AuthEmailVerificationRequired) {
+          AppSnackBar.success(
+            context,
+            'Account created! Please check your email to verify your account.',
+            title: 'Verify your email',
+          );
+        }
+      },
+  child: AuthPageLayout(
       badge: 'auth.register:v1',
       title: 'Create your account',
       subtitle:
-          'Join the developer network and discover breakthrough open-source '
+          'Join the developer services and discover breakthrough open-source '
           'software.',
       form: AutofillGroup(
         child: Form(
@@ -235,6 +263,7 @@ class _RegisterPageState extends State<RegisterPage> {
                 text: 'Create account',
                 icon: const Icon(Icons.arrow_forward_rounded),
                 onPressed: _createAccount,
+                isLoading: _isLoading,
               ),
               SizedBox(height: 20.h),
               const AuthDivider(label: 'OR REGISTER WITH'),
@@ -261,6 +290,7 @@ class _RegisterPageState extends State<RegisterPage> {
         actionLabel: 'Sign in',
         onPressed: _goToLogin,
       ),
-    );
+    ),
+);
   }
 }

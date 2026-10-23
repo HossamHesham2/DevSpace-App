@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:dev_space/core/constants/app_assets.dart';
 import 'package:dev_space/core/constants/app_constants.dart';
 import 'package:dev_space/core/extensions/color_extension.dart';
+import 'package:dev_space/core/helpers/prefs_helper.dart';
 import 'package:dev_space/core/router/route_names.dart';
 import 'package:dev_space/core/widgets/d_scaffold.dart';
 import 'package:flutter/material.dart';
@@ -24,14 +25,18 @@ class _SplashPageState extends State<SplashPage> {
   void initState() {
     super.initState();
 
-    _navigationTimer = Timer(
-      const Duration(milliseconds: 5000),
-          () {
-        if (!mounted) return;
+    _navigationTimer = Timer(const Duration(seconds: 5), () {
+      if (!mounted) return;
 
+      final isOnboardingCompleted =
+          PrefsHelper.instance.getBool(AppConstants.onboardingCompleted) ?? false;
+
+      if (isOnboardingCompleted) {
+        context.goNamed(RouteNames.auth);
+      } else {
         context.goNamed(RouteNames.onboarding);
-      },
-    );
+      }
+    });
   }
 
   @override
@@ -71,20 +76,14 @@ class _SplashPageState extends State<SplashPage> {
                       ),
                     ),
                     SizedBox(width: 10.w),
-                    Text(
-                      "SECURE LINK",
-                      style: appText.labelMedium,
-                    ),
+                    Text("SECURE LINK", style: appText.labelMedium),
                   ],
                 ),
               ),
 
               // Production Badge
               Container(
-                padding: EdgeInsets.symmetric(
-                  horizontal: 16.w,
-                  vertical: 10.h,
-                ),
+                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
                 decoration: BoxDecoration(
                   color: appColors.surfaceContainer,
                   borderRadius: BorderRadius.circular(16.r),
@@ -102,10 +101,7 @@ class _SplashPageState extends State<SplashPage> {
                       ),
                     ),
                     SizedBox(width: 10.w),
-                    Text(
-                      "PROD",
-                      style: appText.labelMedium,
-                    ),
+                    Text("PROD", style: appText.labelMedium),
                   ],
                 ),
               ),
@@ -120,10 +116,7 @@ class _SplashPageState extends State<SplashPage> {
             decoration: BoxDecoration(
               color: appColors.surface,
               borderRadius: BorderRadius.circular(24.r),
-              border: Border.all(
-                color: appColors.outlineVariant,
-                width: 2,
-              ),
+              border: Border.all(color: appColors.outlineVariant, width: 2),
               boxShadow: [
                 BoxShadow(
                   color: appColors.primary.withValues(alpha: 0.25),
@@ -159,9 +152,7 @@ class _SplashPageState extends State<SplashPage> {
                       width: 9.r,
                       height: 9.r,
                       decoration: BoxDecoration(
-                        color: appColors.primary.withValues(
-                          alpha: 0.5,
-                        ),
+                        color: appColors.primary.withValues(alpha: 0.5),
                         shape: BoxShape.circle,
                       ),
                     ),
@@ -206,10 +197,7 @@ class _SplashPageState extends State<SplashPage> {
 
           // ================= VERSION =================
           Container(
-            padding: EdgeInsets.symmetric(
-              horizontal: 16.w,
-              vertical: 10.h,
-            ),
+            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
             decoration: BoxDecoration(
               color: appColors.surfaceContainer,
               borderRadius: BorderRadius.circular(16.r),
@@ -217,10 +205,7 @@ class _SplashPageState extends State<SplashPage> {
             child: Row(
               mainAxisSize: MainAxisSize.min,
               children: [
-                Text(
-                  "v1.0.0",
-                  style: appText.labelSmall,
-                ),
+                Text("v1.0.0", style: appText.labelSmall),
 
                 SizedBox(width: 8.w),
 
@@ -235,10 +220,7 @@ class _SplashPageState extends State<SplashPage> {
 
                 SizedBox(width: 8.w),
 
-                Text(
-                  "Production Ready",
-                  style: appText.labelMedium,
-                ),
+                Text("Production Ready", style: appText.labelMedium),
               ],
             ),
           ),

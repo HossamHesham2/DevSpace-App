@@ -20,14 +20,9 @@ class AppTransitions {
         final tween = Tween(
           begin: begin,
           end: end,
-        ).chain(
-          CurveTween(curve: Curves.easeInOutCubic),
-        );
+        ).chain(CurveTween(curve: Curves.easeInOutCubic));
 
-        return SlideTransition(
-          position: animation.drive(tween),
-          child: child,
-        );
+        return SlideTransition(position: animation.drive(tween), child: child);
       },
     );
   }
@@ -41,10 +36,7 @@ class AppTransitions {
       transitionDuration: const Duration(milliseconds: 300),
       child: child,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        return FadeTransition(
-          opacity: animation,
-          child: child,
-        );
+        return FadeTransition(opacity: animation, child: child);
       },
     );
   }
@@ -59,22 +51,17 @@ class AppTransitions {
       reverseTransitionDuration: const Duration(milliseconds: 300),
       child: child,
       transitionsBuilder: (context, animation, secondaryAnimation, child) {
-        final offsetAnimation = Tween<Offset>(
-          begin: const Offset(0.0, 0.15),
-          end: Offset.zero,
-        ).animate(
-          CurvedAnimation(
-            parent: animation,
-            curve: Curves.easeOutCubic,
-          ),
-        );
+        final offsetAnimation =
+            Tween<Offset>(
+              begin: const Offset(0.0, 0.15),
+              end: Offset.zero,
+            ).animate(
+              CurvedAnimation(parent: animation, curve: Curves.easeOutCubic),
+            );
 
         return SlideTransition(
           position: offsetAnimation,
-          child: FadeTransition(
-            opacity: animation,
-            child: child,
-          ),
+          child: FadeTransition(opacity: animation, child: child),
         );
       },
     );

@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
 import 'app_text_theme.dart';
@@ -38,10 +38,7 @@ class AppTheme {
 
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: colorScheme.primary,
-            width: 2,
-          ),
+          borderSide: BorderSide(color: colorScheme.primary, width: 2),
         ),
 
         errorBorder: OutlineInputBorder(
@@ -51,22 +48,32 @@ class AppTheme {
 
         focusedErrorBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(12),
-          borderSide: BorderSide(
-            color: colorScheme.error,
-            width: 2,
-          ),
+          borderSide: BorderSide(color: colorScheme.error, width: 2),
         ),
 
-        hintStyle: TextStyle(
-          color: colorScheme.onSurfaceVariant,
-        ),
+        hintStyle: TextStyle(color: colorScheme.onSurfaceVariant),
 
-        labelStyle: TextStyle(
-          color: colorScheme.onSurfaceVariant,
-        ),
+        labelStyle: TextStyle(color: colorScheme.onSurfaceVariant),
 
         prefixIconColor: colorScheme.onSurfaceVariant,
         suffixIconColor: colorScheme.onSurfaceVariant,
+      ),
+
+      // Sensible defaults for plain snackbars. Prefer the AppSnackBar helpers,
+      // which render a fully custom, themed card on top of these settings.
+      snackBarTheme: SnackBarThemeData(
+        behavior: SnackBarBehavior.floating,
+        backgroundColor: colorScheme.inverseSurface,
+        contentTextStyle: textTheme.bodyMedium?.copyWith(
+          color: colorScheme.onInverseSurface,
+        ),
+        actionTextColor: colorScheme.inversePrimary,
+        elevation: 4,
+        insetPadding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+        dismissDirection: DismissDirection.horizontal,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+        ),
       ),
     );
   }
