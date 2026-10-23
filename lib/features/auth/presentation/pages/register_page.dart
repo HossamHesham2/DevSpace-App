@@ -93,6 +93,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
   void _continueWithGitHub() {
     FocusScope.of(context).unfocus();
+    context.read<AuthCubit>().signInWithGitHub();
   }
 
   void _goToLogin() {

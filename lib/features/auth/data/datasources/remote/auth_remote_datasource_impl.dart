@@ -56,4 +56,12 @@ class AuthRemoteDatasourceImpl extends AuthRemoteDatasource {
 
   @override
   User? get currentUser => _supabaseClient.auth.currentUser;
+
+  @override
+  Future<bool> signInWithGitHub() async{
+    return await _supabaseClient.auth.signInWithOAuth(
+      OAuthProvider.github,
+      redirectTo: 'io.devspace.app://login-callback/',
+    );
+  }
 }

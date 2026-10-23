@@ -1,11 +1,11 @@
 {
-    "name": "dev_space",
-    "short_name": "dev_space",
+    "name": "DevSpace",
+    "short_name": "DevSpace",
     "start_url": ".",
     "display": "standalone",
-    "background_color": "#0175C2",
-    "theme_color": "#0175C2",
-    "description": "A devSpace Flutter project",
+    "background_color": "#0F0A2E",
+    "theme_color": "#0F0A2E",
+    "description": "DevSpace - connect, share, and grow with the developer community.",
     "orientation": "portrait-primary",
     "prefer_related_applications": false,
     "icons": [

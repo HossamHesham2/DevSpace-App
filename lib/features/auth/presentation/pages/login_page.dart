@@ -77,6 +77,7 @@ class _LoginPageState extends State<LoginPage> {
 
   void _continueWithGitHub() {
     FocusScope.of(context).unfocus();
+    context.read<AuthCubit>().signInWithGitHub();
   }
 
   @override

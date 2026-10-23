@@ -5,6 +5,7 @@ import 'package:dev_space/features/auth/domain/entities/auth_entity.dart';
 import 'package:dev_space/features/auth/domain/repositories/auth_repository.dart';
 import 'package:dev_space/features/auth/domain/usecases/send_password_reset_email_usecase.dart';
 import 'package:dev_space/features/auth/domain/usecases/sign_in_use_case.dart';
+import 'package:dev_space/features/auth/domain/usecases/sign_in_with_github_use_case.dart';
 import 'package:dev_space/features/auth/domain/usecases/sign_out_use_case.dart';
 import 'package:dev_space/features/auth/domain/usecases/sign_up_use_case.dart';
 import 'package:injectable/injectable.dart';
@@ -19,6 +20,7 @@ class AuthCubit extends Cubit<AuthState> {
   final SignOutUseCase _signOutUseCase;
   final SendPasswordResetEmailUseCase _resetPasswordUseCase;
   final AuthRepository _authRepository;
+  final SignInWithGitHubUseCase _signInWithGitHubUseCase;
   StreamSubscription<supabase.AuthState>? _authSubscription;
 
   AuthCubit({
@@ -27,6 +29,7 @@ class AuthCubit extends Cubit<AuthState> {
     required this._signOutUseCase,
     required this._resetPasswordUseCase,
     required this._authRepository,
+    required this._signInWithGitHubUseCase,
   }) : super(const AuthInitial());
 
   Future<void> signIn({required String email, required String password}) async {
@@ -46,7 +49,22 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthError(e.toString()));
     }
   }
+  Future<void> signInWithGitHub() async {
+    emit(AuthLoading());
 
+    final result = await _signInWithGitHubUseCase();
+
+    result.fold(
+          (failure) {
+        emit(AuthError(failure.errorMessage));
+      },
+          (started) {
+        if (!started) {
+          emit(AuthError('Could not start GitHub authentication.'));
+        }
+      },
+    );
+  }
   Future<void> signUp({
     required String fullName,
     required String email,
