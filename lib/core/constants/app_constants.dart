@@ -4,5 +4,6 @@ class AppConstants {
   static const String appVersion = '1.0.0';
   static const String githubBaseUrl = 'https://api.github.com';
   static const String onboardingCompleted = 'onboarding_completed';
+  static const String rememberMe = 'remember_me';
 }
 // supabase password f9EKVMFvVD?3h2Y

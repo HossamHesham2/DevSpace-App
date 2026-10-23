@@ -1,4 +1,6 @@
 import 'package:dev_space/core/constants/app_assets.dart';
+import 'package:dev_space/core/constants/app_constants.dart';
+import 'package:dev_space/core/helpers/prefs_helper.dart';
 import 'package:dev_space/core/helpers/validators.dart';
 import 'package:dev_space/core/router/route_names.dart';
 import 'package:dev_space/core/widgets/app_snackbar.dart';
@@ -32,6 +34,13 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    _rememberMe =
+        PrefsHelper.instance.getBool(AppConstants.rememberMe) ?? false;
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
@@ -39,13 +48,17 @@ class _LoginPageState extends State<LoginPage> {
     super.dispose();
   }
 
-  void _signIn() {
+  Future<void> _signIn() async {
     FocusScope.of(context).unfocus();
 
     final isValid = _formKey.currentState?.validate() ?? false;
     if (!isValid) return;
 
-    context.read<AuthCubit>().signIn(
+    await PrefsHelper.instance.setBool(AppConstants.rememberMe, _rememberMe);
+
+    if (!mounted) return;
+
+    await context.read<AuthCubit>().signIn(
       email: _emailController.text.trim(),
       password: _passwordController.text,
     );
@@ -73,6 +86,11 @@ class _LoginPageState extends State<LoginPage> {
 
     return BlocListener<AuthCubit, AuthState>(
       listener: (context, state) {
+        if (state is AuthAuthenticated) {
+          context.goNamed(RouteNames.main);
+          return;
+        }
+
         setState(() {
           _isLoading = state is AuthLoading;
         });

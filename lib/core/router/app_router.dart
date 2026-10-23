@@ -1,9 +1,10 @@
-﻿import 'package:dev_space/core/router/app_transitions.dart';
+import 'package:dev_space/core/router/app_transitions.dart';
 import 'package:dev_space/core/router/route_names.dart';
 import 'package:dev_space/features/auth/presentation/pages/auth_page.dart';
 import 'package:dev_space/features/auth/presentation/pages/login_page.dart';
 import 'package:dev_space/features/auth/presentation/pages/register_page.dart';
 import 'package:dev_space/features/auth/presentation/pages/reset_password_page.dart';
+import 'package:dev_space/features/main/presentation/pages/main_layout.dart';
 import 'package:dev_space/features/onboarding/presentation/pages/onboarding_page.dart';
 import 'package:dev_space/features/splash/presentation/pages/splash_page.dart';
 import 'package:go_router/go_router.dart';
@@ -56,6 +57,12 @@ class AppRouter {
             initialEmail: state.uri.queryParameters['email'],
           ),
         ),
+      ),
+      GoRoute(
+        path: RouteNames.main,
+        name: RouteNames.main,
+        pageBuilder: (context, state) =>
+            AppTransitions.fade(state: state, child: const MainLayout()),
       ),
     ],
   );

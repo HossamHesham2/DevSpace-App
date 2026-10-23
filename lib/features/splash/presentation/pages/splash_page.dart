@@ -6,7 +6,10 @@ import 'package:dev_space/core/extensions/color_extension.dart';
 import 'package:dev_space/core/helpers/prefs_helper.dart';
 import 'package:dev_space/core/router/route_names.dart';
 import 'package:dev_space/core/widgets/d_scaffold.dart';
+import 'package:dev_space/features/auth/presentation/cubit/auth_cubit.dart';
+import 'package:dev_space/features/auth/presentation/cubit/auth_state.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
 import 'package:go_router/go_router.dart';
@@ -29,13 +32,22 @@ class _SplashPageState extends State<SplashPage> {
       if (!mounted) return;
 
       final isOnboardingCompleted =
-          PrefsHelper.instance.getBool(AppConstants.onboardingCompleted) ?? false;
+          PrefsHelper.instance.getBool(AppConstants.onboardingCompleted) ??
+          false;
 
-      if (isOnboardingCompleted) {
-        context.goNamed(RouteNames.auth);
-      } else {
+      if (!isOnboardingCompleted) {
         context.goNamed(RouteNames.onboarding);
+        return;
       }
+
+      final rememberMe =
+          PrefsHelper.instance.getBool(AppConstants.rememberMe) ?? false;
+      final isAuthenticated =
+          context.read<AuthCubit>().state is AuthAuthenticated;
+
+      context.goNamed(
+        rememberMe && isAuthenticated ? RouteNames.main : RouteNames.auth,
+      );
     });
   }
 
