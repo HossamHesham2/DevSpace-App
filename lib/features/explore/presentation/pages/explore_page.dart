@@ -32,9 +32,9 @@ class ExplorePage extends StatelessWidget {
         surfaceTintColor: AppColors.transparent,
         elevation: 0,
         scrolledUnderElevation: 0,
-        leadingWidth: 40.w,
+        leadingWidth: 30.w,
         leading: Padding(
-          padding: EdgeInsets.only(right: 12.w),
+          padding: EdgeInsets.only(right: 10.w),
           child: Center(
             child: SvgPicture.asset(
               AppSvgs.logoCode,
@@ -52,11 +52,7 @@ class ExplorePage extends StatelessWidget {
                 AppConstants.appName,
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
-                style: text.titleLarge?.copyWith(
-                  color: colors.onSurface,
-                  fontWeight: FontWeight.w700,
-                  letterSpacing: 0.4,
-                ),
+                style: text.titleMedium?.copyWith(letterSpacing: 0.4),
               ),
             ),
             SizedBox(width: 8.w),
@@ -114,11 +110,21 @@ class ExplorePage extends StatelessWidget {
                   onForegroundImageError: hasAvatar
                       ? (exception, stackTrace) {}
                       : null,
-                  child: Icon(
-                    Icons.person_rounded,
-                    size: 40.r,
-                    color: colors.onSurfaceVariant,
-                  ),
+                  child: hasAvatar
+                      ? SizedBox(
+                          width: 20.r,
+                          height: 20.r,
+                          child: CircularProgressIndicator(
+                            strokeWidth: 3.r,
+                            strokeCap: StrokeCap.round,
+                            color: colors.primary,
+                          ),
+                        )
+                      : Icon(
+                          Icons.person_rounded,
+                          size: 40.r,
+                          color: colors.onSurfaceVariant,
+                        ),
                 ),
               ),
             ),
@@ -131,12 +137,11 @@ class ExplorePage extends StatelessWidget {
         ),
       ),
 
-      body: Column(),
+      body: Column(children: [],),
     );
   }
 }
 
-/// Small status pill shown next to the application name.
 class _LiveBadge extends StatelessWidget {
   const _LiveBadge({required this.label});
 
