@@ -9,6 +9,7 @@
   static const String main = '/main';
   static const String explore = '/explore';
   static const String search = '/search';
+  static const String settings = '/settings';
   static const String mySpace = '/mySpace';
   static const String insights = '/insights';
   static const String profile = '/profile';

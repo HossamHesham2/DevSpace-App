@@ -1,4 +1,3 @@
-import 'package:dev_space/core/router/app_transitions.dart';
 import 'package:dev_space/core/router/route_names.dart';
 import 'package:dev_space/features/auth/presentation/pages/auth_page.dart';
 import 'package:dev_space/features/auth/presentation/pages/login_page.dart';
@@ -6,7 +5,9 @@ import 'package:dev_space/features/auth/presentation/pages/register_page.dart';
 import 'package:dev_space/features/auth/presentation/pages/reset_password_page.dart';
 import 'package:dev_space/features/main/presentation/pages/main_layout.dart';
 import 'package:dev_space/features/onboarding/presentation/pages/onboarding_page.dart';
+import 'package:dev_space/features/settings/presentation/pages/settings_page.dart';
 import 'package:dev_space/features/splash/presentation/pages/splash_page.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:go_router/go_router.dart';
 
 class AppRouter {
@@ -20,39 +21,35 @@ class AppRouter {
         path: RouteNames.splash,
         name: RouteNames.splash,
         pageBuilder: (context, state) =>
-            AppTransitions.fade(state: state, child: const SplashPage()),
+            CupertinoPage(child: const SplashPage()),
       ),
       GoRoute(
         path: RouteNames.onboarding,
         name: RouteNames.onboarding,
-        pageBuilder: (context, state) => AppTransitions.slideFade(
-          state: state,
-          child: const OnboardingPage(),
-        ),
+        pageBuilder: (context, state) =>
+            CupertinoPage(child: const OnboardingPage()),
       ),
       GoRoute(
         path: RouteNames.auth,
         name: RouteNames.auth,
-        pageBuilder: (context, state) =>
-            AppTransitions.fade(state: state, child: const AuthPage()),
+        pageBuilder: (context, state) => CupertinoPage(child: const AuthPage()),
       ),
       GoRoute(
         path: RouteNames.login,
         name: RouteNames.login,
         pageBuilder: (context, state) =>
-            AppTransitions.slide(state: state, child: const LoginPage()),
+            CupertinoPage(child: const LoginPage()),
       ),
       GoRoute(
         path: RouteNames.register,
         name: RouteNames.register,
         pageBuilder: (context, state) =>
-            AppTransitions.slide(state: state, child: const RegisterPage()),
+            CupertinoPage(child: const RegisterPage()),
       ),
       GoRoute(
         path: RouteNames.resetPassword,
         name: RouteNames.resetPassword,
-        pageBuilder: (context, state) => AppTransitions.slide(
-          state: state,
+        pageBuilder: (context, state) => CupertinoPage(
           child: ResetPasswordPage(
             initialEmail: state.uri.queryParameters['email'],
           ),
@@ -62,7 +59,13 @@ class AppRouter {
         path: RouteNames.main,
         name: RouteNames.main,
         pageBuilder: (context, state) =>
-            AppTransitions.fade(state: state, child: const MainLayout()),
+            CupertinoPage(child: const MainLayout()),
+      ),
+      GoRoute(
+        path: RouteNames.settings,
+        name: RouteNames.settings,
+        pageBuilder: (context, state) =>
+            CupertinoPage(child: const SettingsPage()),
       ),
     ],
   );

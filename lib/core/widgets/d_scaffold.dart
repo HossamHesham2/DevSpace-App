@@ -14,7 +14,7 @@ class DScaffold extends StatelessWidget {
     this.extendBody = false,
     this.extendBodyBehindAppBar = false,
     this.safeArea = true,
-    this.padding = const EdgeInsets.all(16),
+    this.padding = const EdgeInsets.all(12),
   });
 
   final Widget body;

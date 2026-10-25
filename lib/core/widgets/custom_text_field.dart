@@ -2,7 +2,7 @@
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomTextField extends StatelessWidget {
-  final String label;
+  final String? label;
   final String? hintText;
   final Widget? prefix;
   final Widget? suffix;
@@ -15,13 +15,15 @@ class CustomTextField extends StatelessWidget {
   final TextEditingController? controller;
   final FocusNode? focusNode;
   final String? Function(String?)? validator;
+  final void Function()? onTap;
   final ValueChanged<String>? onFieldSubmitted;
   final bool autocorrect;
+  final bool enabled;
   final bool enableSuggestions;
 
   const CustomTextField({
     super.key,
-    required this.label,
+    this.label,
     this.hintText,
     this.suffix,
     this.validator,
@@ -31,11 +33,13 @@ class CustomTextField extends StatelessWidget {
     this.textCapitalization = TextCapitalization.none,
     this.autofillHints,
     this.controller,
+    this.onTap,
     this.focusNode,
     this.obscureText = false,
     this.onFieldSubmitted,
     this.autocorrect = false,
     this.enableSuggestions = true,
+    this.enabled = true,
     this.prefix,
   });
 
@@ -48,14 +52,16 @@ class CustomTextField extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          label,
-          style: text.labelLarge?.copyWith(
-            color: colors.onSurfaceVariant,
-            fontWeight: FontWeight.w600,
+        if (label != null && label!.isNotEmpty) ...[
+          Text(
+            label!,
+            style: text.labelLarge?.copyWith(
+              color: colors.onSurfaceVariant,
+              fontWeight: FontWeight.w600,
+            ),
           ),
-        ),
-        SizedBox(height: 8.h),
+          SizedBox(height: 8.h),
+        ],
         TextFormField(
           validator: validator,
           obscureText: obscureText,
@@ -70,6 +76,8 @@ class CustomTextField extends StatelessWidget {
           onFieldSubmitted: onFieldSubmitted,
           textAlign: textAlign ?? TextAlign.start,
           style: text.bodyLarge,
+          enabled: enabled,
+          onTap: onTap ,
           decoration: InputDecoration(
             prefixIcon: prefix,
             suffixIcon: suffix,

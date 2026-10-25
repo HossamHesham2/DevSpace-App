@@ -1,6 +1,7 @@
 import 'package:dev_space/core/constants/app_assets.dart';
 import 'package:dev_space/core/di/dependency_injection.dart';
 import 'package:dev_space/core/extensions/color_extension.dart';
+import 'package:dev_space/core/router/route_names.dart';
 import 'package:dev_space/core/widgets/d_scaffold.dart';
 import 'package:dev_space/core/widgets/primary_button.dart';
 import 'package:dev_space/features/profile/domain/entities/github_profile_entity.dart';
@@ -9,6 +10,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:go_router/go_router.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:url_launcher/url_launcher.dart';
 
@@ -103,7 +105,9 @@ class _ProfileHeader extends StatelessWidget {
             border: Border.all(color: colors.outlineVariant),
           ),
           child: IconButton(
-            onPressed: () {},
+            onPressed: () {
+              context.pushNamed(RouteNames.settings);
+            },
             icon: Icon(Icons.settings_outlined, color: colors.onSurface),
           ),
         ),
@@ -358,7 +362,6 @@ class _AboutCard extends StatelessWidget {
     );
   }
 }
-
 
 class _SettingsCard extends StatelessWidget {
   const _SettingsCard();
