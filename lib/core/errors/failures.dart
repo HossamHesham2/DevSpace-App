@@ -1,13 +1,19 @@
 abstract class Failure {
-  final String errorMessage;
+  const Failure({required this.errorMessage});
 
-  new({required this.errorMessage});
+  final String errorMessage;
 }
 
 class ServerFailure extends Failure {
-  new({required super.errorMessage});
+  const ServerFailure({required super.errorMessage, this.statusCode});
+
+  /// The HTTP status code that produced this failure, when available.
+  ///
+  /// Used by callers that need to react to specific responses
+  /// (for example GitHub rate limiting: 403 / 429).
+  final int? statusCode;
 }
 
 class CacheFailure extends Failure {
-  new({required super.errorMessage});
+  const CacheFailure({required super.errorMessage});
 }

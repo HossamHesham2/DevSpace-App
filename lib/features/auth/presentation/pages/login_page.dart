@@ -31,7 +31,6 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _obscurePassword = true;
   bool _rememberMe = false;
-  bool _isLoading = false;
 
   @override
   void initState() {
@@ -75,9 +74,10 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 
-  void _continueWithGitHub() {
+  void _continueWithGitHub() async{
     FocusScope.of(context).unfocus();
-    context.read<AuthCubit>().signInWithGitHub();
+    await context.read<AuthCubit>().signInWithGitHub();
+    await PrefsHelper.instance.setBool(AppConstants.rememberMe,true);
   }
 
   @override
@@ -85,140 +85,138 @@ class _LoginPageState extends State<LoginPage> {
     final colors = Theme.of(context).colorScheme;
     final text = Theme.of(context).textTheme;
 
-    return BlocListener<AuthCubit, AuthState>(
+    return BlocConsumer<AuthCubit, AuthState>(
       listener: (context, state) {
         if (state is AuthAuthenticated) {
           context.goNamed(RouteNames.main);
-          return;
-        }
-
-        setState(() {
-          _isLoading = state is AuthLoading;
-        });
-
-        if (state is AuthError) {
+        } else if (state is AuthError) {
           AppSnackBar.error(context, state.message, title: 'Sign in failed');
         }
       },
-      child: AuthPageLayout(
-        badge: 'auth.login:v1',
-        title: 'Welcome back',
-        subtitle: 'Enter your credentials to access your DevSpace.',
-        form: AutofillGroup(
-          child: Form(
-            key: _formKey,
-            autovalidateMode: AutovalidateMode.onUserInteraction,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.stretch,
-              children: [
-                CustomTextField(
-                  label: 'Email address',
-                  hintText: 'you@example.com',
-                  controller: _emailController,
-                  keyboardType: TextInputType.emailAddress,
-                  textInputAction: TextInputAction.next,
-                  autofillHints: const [AutofillHints.email],
-                  validator: Validators.email,
-                  prefix: Icon(Icons.email_outlined, size: 20.r),
-                  onFieldSubmitted: (_) => _passwordFocusNode.requestFocus(),
-                ),
-                SizedBox(height: 16.h),
-                CustomTextField(
-                  label: 'Password',
-                  hintText: 'Enter your password',
-                  controller: _passwordController,
-                  focusNode: _passwordFocusNode,
-                  keyboardType: TextInputType.visiblePassword,
-                  textInputAction: TextInputAction.done,
-                  autofillHints: const [AutofillHints.password],
-                  obscureText: _obscurePassword,
-                  enableSuggestions: false,
-                  validator: Validators.password,
-                  prefix: Icon(Icons.lock_outline_rounded, size: 20.r),
-                  onFieldSubmitted: (_) => _signIn(),
-                  suffix: IconButton(
-                    tooltip: _obscurePassword
-                        ? 'Show password'
-                        : 'Hide password',
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                    icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_off_outlined
-                          : Icons.visibility_outlined,
-                      size: 20.r,
+      builder: (context, state) {
+        final isLoadingForGitHub = state is AuthLoadingGitHub;
+        final isLoadingForEmail = state is AuthLoading && !isLoadingForGitHub;
+        return AuthPageLayout(
+          badge: 'auth.login:v1',
+          title: 'Welcome back',
+          subtitle: 'Enter your credentials to access your DevSpace.',
+          form: AutofillGroup(
+            child: Form(
+              key: _formKey,
+              autovalidateMode: AutovalidateMode.onUserInteraction,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  CustomTextField(
+                    label: 'Email address',
+                    hintText: 'you@example.com',
+                    controller: _emailController,
+                    keyboardType: TextInputType.emailAddress,
+                    textInputAction: TextInputAction.next,
+                    autofillHints: const [AutofillHints.email],
+                    validator: Validators.email,
+                    prefix: Icon(Icons.email_outlined, size: 20.r),
+                    onFieldSubmitted: (_) => _passwordFocusNode.requestFocus(),
+                  ),
+                  SizedBox(height: 16.h),
+                  CustomTextField(
+                    label: 'Password',
+                    hintText: 'Enter your password',
+                    controller: _passwordController,
+                    focusNode: _passwordFocusNode,
+                    keyboardType: TextInputType.visiblePassword,
+                    textInputAction: TextInputAction.done,
+                    autofillHints: const [AutofillHints.password],
+                    obscureText: _obscurePassword,
+                    enableSuggestions: false,
+                    validator: Validators.password,
+                    prefix: Icon(Icons.lock_outline_rounded, size: 20.r),
+                    onFieldSubmitted: (_) => _signIn(),
+                    suffix: IconButton(
+                      tooltip: _obscurePassword
+                          ? 'Show password'
+                          : 'Hide password',
+                      onPressed: () {
+                        setState(() {
+                          _obscurePassword = !_obscurePassword;
+                        });
+                      },
+                      icon: Icon(
+                        _obscurePassword
+                            ? Icons.visibility_off_outlined
+                            : Icons.visibility_outlined,
+                        size: 20.r,
+                      ),
                     ),
                   ),
-                ),
-                SizedBox(height: 4.h),
-                Row(
-                  children: [
-                    Expanded(
-                      child: Material(
-                        type: MaterialType.transparency,
-                        child: CheckboxListTile(
-                          value: _rememberMe,
-                          onChanged: (value) {
-                            setState(() {
-                              _rememberMe = value ?? false;
-                            });
-                          },
-                          title: Text('Remember me', style: text.bodySmall),
-                          controlAffinity: ListTileControlAffinity.leading,
-                          contentPadding: EdgeInsets.zero,
-                          dense: true,
-                          visualDensity: VisualDensity.compact,
+                  SizedBox(height: 4.h),
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Material(
+                          type: MaterialType.transparency,
+                          child: CheckboxListTile(
+                            value: _rememberMe,
+                            onChanged: (value) {
+                              setState(() {
+                                _rememberMe = value ?? false;
+                              });
+                            },
+                            title: Text('Remember me', style: text.bodySmall),
+                            controlAffinity: ListTileControlAffinity.leading,
+                            contentPadding: EdgeInsets.zero,
+                            dense: true,
+                            visualDensity: VisualDensity.compact,
+                          ),
                         ),
                       ),
-                    ),
-                    TextButton(
-                      onPressed: _forgotPassword,
-                      style: TextButton.styleFrom(
-                        foregroundColor: colors.primary,
-                        padding: EdgeInsets.symmetric(horizontal: 4.w),
-                        minimumSize: const Size(0, 48),
-                        textStyle: text.labelMedium,
+                      TextButton(
+                        onPressed: _forgotPassword,
+                        style: TextButton.styleFrom(
+                          foregroundColor: colors.primary,
+                          padding: EdgeInsets.symmetric(horizontal: 4.w),
+                          minimumSize: const Size(0, 48),
+                          textStyle: text.labelMedium,
+                        ),
+                        child: const Text('Forgot password?'),
                       ),
-                      child: const Text('Forgot password?'),
-                    ),
-                  ],
-                ),
-                SizedBox(height: 8.h),
-                PrimaryButton(
-                  text: 'Sign in',
-                  icon: const Icon(Icons.arrow_forward_rounded),
-                  onPressed: _signIn,
-                  isLoading: _isLoading,
-                ),
-                SizedBox(height: 20.h),
-                const AuthDivider(label: 'OR CONTINUE WITH'),
-                SizedBox(height: 16.h),
-                SecondaryButton(
-                  text: 'Continue with GitHub',
-                  icon: SvgPicture.asset(
-                    AppSvgs.githubIcon,
-                    width: 20.r,
-                    height: 20.r,
-                    colorFilter: ColorFilter.mode(
-                      colors.onSurface,
-                      BlendMode.srcIn,
-                    ),
+                    ],
                   ),
-                  onPressed: _continueWithGitHub,
-                ),
-              ],
+                  SizedBox(height: 8.h),
+                  PrimaryButton(
+                    text: 'Sign in',
+                    icon: const Icon(Icons.arrow_forward_rounded),
+                    onPressed: _signIn,
+                    isLoading: isLoadingForEmail,
+                  ),
+                  SizedBox(height: 20.h),
+                  const AuthDivider(label: 'OR CONTINUE WITH'),
+                  SizedBox(height: 16.h),
+                  SecondaryButton(
+                    text: 'Continue with GitHub',
+                    isLoading: isLoadingForGitHub,
+                    icon: SvgPicture.asset(
+                      AppSvgs.githubIcon,
+                      width: 20.r,
+                      height: 20.r,
+                      colorFilter: ColorFilter.mode(
+                        colors.onSurface,
+                        BlendMode.srcIn,
+                      ),
+                    ),
+                    onPressed: _continueWithGitHub,
+                  ),
+                ],
+              ),
             ),
           ),
-        ),
-        footer: AuthFooterPrompt(
-          prompt: "Don't have an account?",
-          actionLabel: 'Sign up',
-          onPressed: () => context.pushNamed(RouteNames.register),
-        ),
-      ),
+          footer: AuthFooterPrompt(
+            prompt: "Don't have an account?",
+            actionLabel: 'Sign up',
+            onPressed: () => context.pushNamed(RouteNames.register),
+          ),
+        );
+      },
     );
   }
 }

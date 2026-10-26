@@ -16,6 +16,10 @@ final class AuthLoading extends AuthState {
   const AuthLoading();
 }
 
+final class AuthLoadingGitHub extends AuthState {
+  const AuthLoadingGitHub();
+}
+
 final class AuthAuthenticated extends AuthState {
   final AuthEntity user;
 

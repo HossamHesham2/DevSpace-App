@@ -46,7 +46,7 @@ class _SplashPageState extends State<SplashPage> {
           context.read<AuthCubit>().state is AuthAuthenticated;
 
       context.goNamed(
-        rememberMe && isAuthenticated ? RouteNames.main : RouteNames.auth,
+        isAuthenticated || rememberMe ? RouteNames.main : RouteNames.auth,
       );
     });
   }
@@ -59,185 +59,221 @@ class _SplashPageState extends State<SplashPage> {
 
   @override
   Widget build(BuildContext context) {
-    final appColors = Theme.of(context).colorScheme;
-    final appText = Theme.of(context).textTheme;
-
     return DScaffold(
       body: Column(
         children: [
-          // ================= HEADER =================
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          // ================= Splash HEADER =================
+          SplashHeader(),
+          const Spacer(),
+          // ================= Splash Content =================
+          SplashContent(),
+
+          const Spacer(),
+
+          SplashFooter(),
+        ],
+      ),
+    );
+  }
+}
+
+class SplashFooter extends StatelessWidget {
+  const SplashFooter({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final appColors = Theme.of(context).colorScheme;
+    final appText = Theme.of(context).textTheme;
+    return Column(
+      children: [
+        // ================= LOADING =================
+        SizedBox(
+          width: 20.r,
+          height: 20.r,
+          child: CircularProgressIndicator(
+            strokeWidth: 3.r,
+            strokeCap: StrokeCap.round,
+            color: appColors.primary,
+          ),
+        ),
+
+        SizedBox(height: 20.h),
+
+        // ================= VERSION =================
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+          decoration: BoxDecoration(
+            color: appColors.surfaceContainer,
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // Secure Link
+              Text("v1.0.0", style: appText.labelSmall),
+
+              SizedBox(width: 8.w),
+
               Container(
-                padding: EdgeInsets.all(8.r),
+                width: 5.r,
+                height: 5.r,
                 decoration: BoxDecoration(
-                  color: appColors.surfaceContainer,
-                  borderRadius: BorderRadius.circular(16.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Container(
-                      width: 12.r,
-                      height: 12.r,
-                      decoration: BoxDecoration(
-                        color: appColors.success,
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                    SizedBox(width: 10.w),
-                    Text("SECURE LINK", style: appText.labelMedium),
-                  ],
+                  color: appColors.onSurface,
+                  shape: BoxShape.circle,
                 ),
               ),
 
-              // Production Badge
-              Container(
-                padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
-                decoration: BoxDecoration(
-                  color: appColors.surfaceContainer,
-                  borderRadius: BorderRadius.circular(16.r),
-                ),
-                child: Row(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    SvgPicture.asset(
-                      AppSvgs.logoCode,
-                      width: 15.r,
-                      height: 15.r,
-                      colorFilter: ColorFilter.mode(
-                        appColors.onSurface,
-                        BlendMode.srcIn,
-                      ),
-                    ),
-                    SizedBox(width: 10.w),
-                    Text("PROD", style: appText.labelMedium),
-                  ],
-                ),
+              SizedBox(width: 8.w),
+
+              Text("Production Ready", style: appText.labelMedium),
+            ],
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+class SplashContent extends StatelessWidget {
+  const SplashContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final appColors = Theme.of(context).colorScheme;
+    final appText = Theme.of(context).textTheme;
+    return Column(
+      children: [
+        Container(
+          padding: EdgeInsets.all(14.r),
+          decoration: BoxDecoration(
+            color: appColors.surface,
+            borderRadius: BorderRadius.circular(24.r),
+            border: Border.all(color: appColors.outlineVariant, width: 2),
+            boxShadow: [
+              BoxShadow(
+                color: appColors.primary.withValues(alpha: 0.25),
+                blurRadius: 24.r,
+                spreadRadius: 2.r,
+                offset: Offset(0, 4.h),
               ),
             ],
           ),
-
-          const Spacer(),
-
-          // ================= LOGO =================
-          Container(
-            padding: EdgeInsets.all(14.r),
-            decoration: BoxDecoration(
-              color: appColors.surface,
-              borderRadius: BorderRadius.circular(24.r),
-              border: Border.all(color: appColors.outlineVariant, width: 2),
-              boxShadow: [
-                BoxShadow(
-                  color: appColors.primary.withValues(alpha: 0.25),
-                  blurRadius: 24.r,
-                  spreadRadius: 2.r,
-                  offset: Offset(0, 4.h),
-                ),
-              ],
-            ),
-            child: Container(
-              width: 90.r,
-              height: 90.r,
-              decoration: BoxDecoration(
-                color: appColors.surfaceContainer,
-                borderRadius: BorderRadius.circular(18.r),
-              ),
-              child: Stack(
-                children: [
-                  // Logo
-                  Center(
-                    child: SvgPicture.asset(
-                      AppSvgs.logoCode,
-                      width: 35.r,
-                      height: 35.r,
-                    ),
-                  ),
-
-                  // Purple Dot
-                  Positioned(
-                    top: 10.r,
-                    right: 10.r,
-                    child: Container(
-                      width: 9.r,
-                      height: 9.r,
-                      decoration: BoxDecoration(
-                        color: appColors.primary.withValues(alpha: 0.5),
-                        shape: BoxShape.circle,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          ),
-
-          SizedBox(height: 20.h),
-
-          // ================= APP NAME =================
-          Text(
-            AppConstants.appName,
-            style: appText.headlineLarge,
-            textAlign: TextAlign.center,
-          ),
-
-          SizedBox(height: 10.h),
-
-          // ================= SUBTITLE =================
-          Text(
-            "Your space. Your code. Your community.",
-            style: appText.bodyLarge,
-            textAlign: TextAlign.center,
-          ),
-
-          const Spacer(),
-
-          // ================= LOADING =================
-          SizedBox(
-            width: 20.r,
-            height: 20.r,
-            child: CircularProgressIndicator(
-              strokeWidth: 3.r,
-              strokeCap: StrokeCap.round,
-              color: appColors.primary,
-            ),
-          ),
-
-          SizedBox(height: 20.h),
-
-          // ================= VERSION =================
-          Container(
-            padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+          child: Container(
+            width: 90.r,
+            height: 90.r,
             decoration: BoxDecoration(
               color: appColors.surfaceContainer,
-              borderRadius: BorderRadius.circular(16.r),
+              borderRadius: BorderRadius.circular(18.r),
             ),
-            child: Row(
-              mainAxisSize: MainAxisSize.min,
+            child: Stack(
               children: [
-                Text("v1.0.0", style: appText.labelSmall),
-
-                SizedBox(width: 8.w),
-
-                Container(
-                  width: 5.r,
-                  height: 5.r,
-                  decoration: BoxDecoration(
-                    color: appColors.onSurface,
-                    shape: BoxShape.circle,
+                // Logo
+                Center(
+                  child: SvgPicture.asset(
+                    AppSvgs.logoCode,
+                    width: 35.r,
+                    height: 35.r,
                   ),
                 ),
 
-                SizedBox(width: 8.w),
-
-                Text("Production Ready", style: appText.labelMedium),
+                // Purple Dot
+                Positioned(
+                  top: 10.r,
+                  right: 10.r,
+                  child: Container(
+                    width: 9.r,
+                    height: 9.r,
+                    decoration: BoxDecoration(
+                      color: appColors.primary.withValues(alpha: 0.5),
+                      shape: BoxShape.circle,
+                    ),
+                  ),
+                ),
               ],
             ),
           ),
-        ],
-      ),
+        ),
+
+        SizedBox(height: 20.h),
+
+        // ================= APP NAME =================
+        Text(
+          AppConstants.appName,
+          style: appText.headlineLarge,
+          textAlign: TextAlign.center,
+        ),
+
+        SizedBox(height: 10.h),
+
+        // ================= SUBTITLE =================
+        Text(
+          "Your space. Your code. Your community.",
+          style: appText.bodyLarge,
+          textAlign: TextAlign.center,
+        ),
+      ],
+    );
+  }
+}
+
+class SplashHeader extends StatelessWidget {
+  const SplashHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final appColors = Theme.of(context).colorScheme;
+    final appText = Theme.of(context).textTheme;
+    return Row(
+      mainAxisAlignment: MainAxisAlignment.spaceBetween,
+      children: [
+        // Secure Link
+        Container(
+          padding: EdgeInsets.all(8.r),
+          decoration: BoxDecoration(
+            color: appColors.surfaceContainer,
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 12.r,
+                height: 12.r,
+                decoration: BoxDecoration(
+                  color: appColors.success,
+                  shape: BoxShape.circle,
+                ),
+              ),
+              SizedBox(width: 10.w),
+              Text("SECURE LINK", style: appText.labelMedium),
+            ],
+          ),
+        ),
+
+        // Production Badge
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 16.w, vertical: 10.h),
+          decoration: BoxDecoration(
+            color: appColors.surfaceContainer,
+            borderRadius: BorderRadius.circular(16.r),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              SvgPicture.asset(
+                AppSvgs.logoCode,
+                width: 15.r,
+                height: 15.r,
+                colorFilter: ColorFilter.mode(
+                  appColors.onSurface,
+                  BlendMode.srcIn,
+                ),
+              ),
+              SizedBox(width: 10.w),
+              Text("PROD", style: appText.labelMedium),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }

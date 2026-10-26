@@ -49,22 +49,37 @@ class AuthCubit extends Cubit<AuthState> {
       emit(AuthError(e.toString()));
     }
   }
+
   Future<void> signInWithGitHub() async {
-    emit(AuthLoading());
+    if (isClosed) return;
 
-    final result = await _signInWithGitHubUseCase();
+    try {
+      emit(AuthLoadingGitHub());
 
-    result.fold(
-          (failure) {
-        emit(AuthError(failure.errorMessage));
-      },
-          (started) {
-        if (!started) {
-          emit(AuthError('Could not start GitHub authentication.'));
-        }
-      },
-    );
+      final result = await _signInWithGitHubUseCase();
+
+      if (isClosed) return;
+
+      result.fold(
+            (failure) => emit(AuthError(failure.errorMessage)),
+            (started) {
+          if (!started) {
+            emit(
+              const AuthError(
+                'Could not start GitHub authentication.',
+              ),
+            );
+          }
+          // نجاح الدخول يصدر من listenToAuthChanges
+          // بعد الرجوع من GitHub.
+        },
+      );
+    } catch (e) {
+      if (isClosed) return;
+      emit(AuthError(e.toString()));
+    }
   }
+
   Future<void> signUp({
     required String fullName,
     required String email,
