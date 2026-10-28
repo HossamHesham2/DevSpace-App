@@ -23,7 +23,7 @@ class LoginPage extends StatefulWidget {
   State<LoginPage> createState() => _LoginPageState();
 }
 
-class _LoginPageState extends State<LoginPage> {
+class _LoginPageState extends State<LoginPage> with WidgetsBindingObserver {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
@@ -35,16 +35,27 @@ class _LoginPageState extends State<LoginPage> {
   @override
   void initState() {
     super.initState();
+    WidgetsBinding.instance.addObserver(this);
     _rememberMe =
         PrefsHelper.instance.getBool(AppConstants.rememberMe) ?? false;
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _emailController.dispose();
     _passwordController.dispose();
     _passwordFocusNode.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed || !mounted) return;
+
+    // Returning to the app without a session means the GitHub window was
+    // closed, so the cubit asks the user to start the sign in again.
+    context.read<AuthCubit>().handleGitHubAuthReturn();
   }
 
   Future<void> _signIn() async {
@@ -91,6 +102,14 @@ class _LoginPageState extends State<LoginPage> {
           context.goNamed(RouteNames.main);
         } else if (state is AuthError) {
           AppSnackBar.error(context, state.message, title: 'Sign in failed');
+        } else if (state is AuthGitHubSignInCancelled) {
+          AppSnackBar.warning(
+            context,
+            'GitHub sign in was cancelled. Please start the sign in again.',
+            title: 'Sign in cancelled',
+            actionLabel: 'Try again',
+            onAction: _continueWithGitHub,
+          );
         }
       },
       builder: (context, state) {

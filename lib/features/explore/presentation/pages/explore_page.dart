@@ -5,9 +5,9 @@ import 'package:dev_space/core/extensions/color_extension.dart';
 import 'package:dev_space/core/theme/app_colors.dart';
 import 'package:dev_space/core/widgets/app_snackbar.dart';
 import 'package:dev_space/core/widgets/d_scaffold.dart';
-import 'package:dev_space/core/widgets/primary_button.dart';
+import 'package:dev_space/core/widgets/repository_card.dart';
 import 'package:dev_space/core/widgets/secondary_button.dart';
-import 'package:dev_space/features/explore/domain/entities/explore_repository_entity.dart';
+import 'package:dev_space/core/models/repository_model.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_svg/svg.dart';
@@ -349,7 +349,7 @@ class _LiveBadge extends StatelessWidget {
 class _DeveloperRepoCard extends StatelessWidget {
   const _DeveloperRepoCard({required this.repositories});
 
-  final List<ExploreRepositoryEntity> repositories;
+  final List<RepositoryModel> repositories;
 
   @override
   Widget build(BuildContext context) {
@@ -379,7 +379,7 @@ class _DeveloperRepoCard extends StatelessWidget {
           ...repositories.map(
             (repo) => Padding(
               padding: EdgeInsets.only(bottom: 10.h),
-              child: _RepositoryCard(repository: repo),
+              child: RepositoryCard(repository: repo),
             ),
           ),
         ],
@@ -488,141 +488,13 @@ class _DeveloperDetails extends StatelessWidget {
   }
 }
 
-class _RepositoryCard extends StatelessWidget {
-  const _RepositoryCard({required this.repository});
 
-  final ExploreRepositoryEntity repository;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final text = Theme.of(context).textTheme;
-
-    return Container(
-      width: double.infinity,
-      padding: EdgeInsets.all(10.r),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(22.r),
-        border: Border.all(color: colors.outlineVariant),
-        color: colors.surfaceContainerLow,
-      ),
-      child: Column(
-        children: [
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      'Project: ${repository.name}',
-                      style: text.titleMedium?.copyWith(
-                        color: colors.onSurface,
-                        fontWeight: FontWeight.bold,
-                      ),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-
-                    SizedBox(height: 5.h),
-
-                    Text(
-                      repository.description.isEmpty
-                          ? 'No description available'
-                          : repository.description,
-                      style: text.bodySmall?.copyWith(
-                        color: colors.onSurfaceVariant,
-                      ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-
-                    SizedBox(height: 5.h),
-
-                    Text(
-                      repository.fullName,
-                      style: text.bodySmall?.copyWith(color: colors.primary),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-
-                    SizedBox(height: 5.h),
-
-                    _RepositoryStats(repository: repository),
-                  ],
-                ),
-              ),
-
-              SizedBox(width: 14.w),
-
-              PrimaryButton(
-                text: 'View',
-                icon: SvgPicture.asset(
-                  AppSvgs.openToIcon,
-                  colorFilter: ColorFilter.mode(
-                    colors.onPrimary,
-                    BlendMode.srcIn,
-                  ),
-                ),
-                onPressed: () => _openRepository(context),
-                width: 100,
-              ),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
-
-  Future<void> _openRepository(BuildContext context) async {
-    final url = Uri.tryParse(repository.htmlUrl);
-
-    if (url != null && (url.scheme == 'https' || url.scheme == 'http')) {
-      await launchUrl(url, mode: LaunchMode.externalApplication);
-    }
-  }
-}
 
 /// Compact stars / forks / language row for a repository.
 ///
 /// Missing values fall back safely (counts to `0`, language hidden) so
 /// nothing ever renders as `null`.
-class _RepositoryStats extends StatelessWidget {
-  const _RepositoryStats({required this.repository});
 
-  final ExploreRepositoryEntity repository;
-
-  @override
-  Widget build(BuildContext context) {
-    final colors = Theme.of(context).colorScheme;
-    final text = Theme.of(context).textTheme;
-    final statStyle = text.labelSmall?.copyWith(color: colors.onSurfaceVariant);
-    final iconColor = colors.onSurfaceVariant;
-
-    final language = repository.language?.trim() ?? '';
-
-    return Wrap(
-      spacing: 12.w,
-      runSpacing: 4.h,
-      crossAxisAlignment: WrapCrossAlignment.center,
-      children: [
-        Icon(Icons.star_border_rounded, size: 14, color: iconColor),
-        Text(_formatCount(repository.starsCount), style: statStyle),
-        Icon(Icons.call_split_rounded, size: 14, color: iconColor),
-        Text(_formatCount(repository.forksCount), style: statStyle),
-        if (language.isNotEmpty) ...[
-          Icon(Icons.code_rounded, size: 14, color: iconColor),
-          Text(language, style: statStyle),
-        ],
-      ],
-    );
-  }
-
-  String _formatCount(int count) {
-    if (count < 1000) return '$count';
-    return '${(count / 1000).toStringAsFixed(count < 10000 ? 1 : 0)}k';
-  }
-}
 
 /// Empty-state widget shown when the feed has no developers.
 class _ExploreEmptyView extends StatelessWidget {

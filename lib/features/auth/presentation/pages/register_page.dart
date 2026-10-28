@@ -22,7 +22,8 @@ class RegisterPage extends StatefulWidget {
   State<RegisterPage> createState() => _RegisterPageState();
 }
 
-class _RegisterPageState extends State<RegisterPage> {
+class _RegisterPageState extends State<RegisterPage>
+    with WidgetsBindingObserver {
   final _formKey = GlobalKey<FormState>();
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
@@ -39,7 +40,14 @@ class _RegisterPageState extends State<RegisterPage> {
   bool _isLoading = false;
 
   @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     _fullNameController.dispose();
     _emailController.dispose();
     _passwordController.dispose();
@@ -48,6 +56,15 @@ class _RegisterPageState extends State<RegisterPage> {
     _passwordFocusNode.dispose();
     _confirmPasswordFocusNode.dispose();
     super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state != AppLifecycleState.resumed || !mounted) return;
+
+    // Returning to the app without a session means the GitHub window was
+    // closed, so the cubit asks the user to start the sign up again.
+    context.read<AuthCubit>().handleGitHubAuthReturn();
   }
 
   String? _validateConfirmPassword(String? value) {
@@ -120,6 +137,14 @@ class _RegisterPageState extends State<RegisterPage> {
             context,
             state.message,
             title: 'Sign Up failed',
+          );
+        } else if (state is AuthGitHubSignInCancelled) {
+          AppSnackBar.warning(
+            context,
+            'GitHub sign up was cancelled. Please start the sign up again.',
+            title: 'Sign up cancelled',
+            actionLabel: 'Try again',
+            onAction: _continueWithGitHub,
           );
         } else if (state is AuthEmailVerificationRequired) {
           AppSnackBar.success(

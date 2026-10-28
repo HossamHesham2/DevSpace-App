@@ -1,4 +1,4 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 
 class CustomTextField extends StatelessWidget {
@@ -16,6 +16,7 @@ class CustomTextField extends StatelessWidget {
   final FocusNode? focusNode;
   final String? Function(String?)? validator;
   final void Function()? onTap;
+  final ValueChanged<String>? onChanged;
   final ValueChanged<String>? onFieldSubmitted;
   final bool autocorrect;
   final bool enabled;
@@ -34,6 +35,7 @@ class CustomTextField extends StatelessWidget {
     this.autofillHints,
     this.controller,
     this.onTap,
+    this.onChanged,
     this.focusNode,
     this.obscureText = false,
     this.onFieldSubmitted,
@@ -73,11 +75,12 @@ class CustomTextField extends StatelessWidget {
           autofillHints: autofillHints,
           autocorrect: autocorrect,
           enableSuggestions: enableSuggestions,
+          onChanged: onChanged,
           onFieldSubmitted: onFieldSubmitted,
           textAlign: textAlign ?? TextAlign.start,
           style: text.bodyLarge,
           enabled: enabled,
-          onTap: onTap ,
+          onTap: onTap,
           decoration: InputDecoration(
             prefixIcon: prefix,
             suffixIcon: suffix,

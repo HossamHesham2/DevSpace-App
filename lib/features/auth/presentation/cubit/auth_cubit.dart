@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:dev_space/core/constants/app_constants.dart';
+import 'package:dev_space/core/helpers/prefs_helper.dart';
 import 'package:dev_space/features/auth/domain/entities/auth_entity.dart';
 import 'package:dev_space/features/auth/domain/repositories/auth_repository.dart';
 import 'package:dev_space/features/auth/domain/usecases/send_password_reset_email_usecase.dart';
@@ -22,6 +24,7 @@ class AuthCubit extends Cubit<AuthState> {
   final AuthRepository _authRepository;
   final SignInWithGitHubUseCase _signInWithGitHubUseCase;
   StreamSubscription<supabase.AuthState>? _authSubscription;
+  bool _isGitHubSignInPending = false;
 
   AuthCubit({
     required this._signInUseCase,
@@ -61,8 +64,14 @@ class AuthCubit extends Cubit<AuthState> {
       if (isClosed) return;
 
       result.fold(
-            (failure) => emit(AuthError(failure.errorMessage)),
-            (started) {
+        (failure) {
+          _isGitHubSignInPending = false;
+          emit(AuthError(failure.errorMessage));
+        },
+        (started) {
+          // A started attempt only completes through [listenToAuthChanges]
+          // once the user comes back from GitHub with a session.
+          _isGitHubSignInPending = started;
           if (!started) {
             emit(
               const AuthError(
@@ -70,14 +79,33 @@ class AuthCubit extends Cubit<AuthState> {
               ),
             );
           }
-          // نجاح الدخول يصدر من listenToAuthChanges
-          // بعد الرجوع من GitHub.
         },
       );
     } catch (e) {
+      _isGitHubSignInPending = false;
       if (isClosed) return;
       emit(AuthError(e.toString()));
     }
+  }
+
+  /// Detects a GitHub sign-in that the user abandoned.
+  ///
+  /// A successful OAuth round-trip is reported by [listenToAuthChanges]. When
+  /// the app comes back to the foreground while an attempt is still pending
+  /// and no session exists, the GitHub window was closed (X) instead of
+  /// completed, so the sign-in is marked as cancelled.
+  Future<void> handleGitHubAuthReturn() async {
+    if (isClosed || !_isGitHubSignInPending) return;
+
+    // Give the OAuth deep link a moment to reach Supabase before deciding
+    // that the flow was cancelled.
+    await Future<void>.delayed(const Duration(seconds: 1));
+
+    if (isClosed || !_isGitHubSignInPending) return;
+    if (_authRepository.currentUser != null) return;
+
+    _isGitHubSignInPending = false;
+    emit(const AuthGitHubSignInCancelled());
   }
 
   Future<void> signUp({
@@ -112,14 +140,31 @@ class AuthCubit extends Cubit<AuthState> {
   }
 
   Future<void> signOut() async {
+    if (isClosed) return;
+
+    // Signing out abandons any GitHub attempt that was still waiting for the
+    // user to come back from the GitHub window.
+    _isGitHubSignInPending = false;
+
     try {
       emit(AuthLoading());
       final result = await _signOutUseCase.call();
       if (isClosed) return;
-      result.fold(
-        (failure) => emit(AuthError(failure.errorMessage)),
-        (_) => emit(const AuthUnauthenticated()),
-      );
+
+      if (result.isLeft()) {
+        result.fold(
+          (failure) => emit(AuthError(failure.errorMessage)),
+          (_) {},
+        );
+        return;
+      }
+
+      // Without this the next launch would still find "Remember me" and route
+      // straight back into the app after signing out.
+      await PrefsHelper.instance.setBool(AppConstants.rememberMe, false);
+
+      if (isClosed) return;
+      emit(const AuthUnauthenticated());
     } on Exception catch (e) {
       if (isClosed) return;
       emit(AuthError(e.toString()));
@@ -172,6 +217,7 @@ class AuthCubit extends Cubit<AuthState> {
         case supabase.AuthChangeEvent.signedIn:
         case supabase.AuthChangeEvent.tokenRefreshed:
         case supabase.AuthChangeEvent.userUpdated:
+          _isGitHubSignInPending = false;
           final user = authState.session?.user;
 
           if (user == null) {
@@ -190,6 +236,7 @@ class AuthCubit extends Cubit<AuthState> {
           );
 
         case supabase.AuthChangeEvent.signedOut:
+          _isGitHubSignInPending = false;
           emit(const AuthUnauthenticated());
 
         // Recovery and MFA events do not change the signed-in session here.

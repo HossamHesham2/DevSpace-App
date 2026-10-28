@@ -20,6 +20,11 @@ final class AuthLoadingGitHub extends AuthState {
   const AuthLoadingGitHub();
 }
 
+/// The GitHub window was closed before the user finished signing up.
+final class AuthGitHubSignInCancelled extends AuthState {
+  const AuthGitHubSignInCancelled();
+}
+
 final class AuthAuthenticated extends AuthState {
   final AuthEntity user;
 

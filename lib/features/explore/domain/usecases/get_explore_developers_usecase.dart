@@ -2,7 +2,7 @@ import 'package:dartz/dartz.dart';
 import 'package:dev_space/core/errors/failures.dart';
 import 'package:injectable/injectable.dart';
 
-import 'package:dev_space/features/explore/domain/entities/explore_repository_entity.dart';
+import 'package:dev_space/core/models/repository_model.dart';
 import 'package:dev_space/features/explore/domain/repositories/explore_repository.dart';
 
 /// Builds the Explore feed: up to [maxDevelopers] individual GitHub
@@ -24,11 +24,11 @@ class GetExploreDevelopersUseCase {
 
   GetExploreDevelopersUseCase(this._repository);
 
-  Future<Either<Failure, List<List<ExploreRepositoryEntity>>>> call() async {
+  Future<Either<Failure, List<List<RepositoryModel>>>> call() async {
     final result = await _repository.getExploreRepositories();
 
     return result.fold((failure) => Left(failure), (repositories) async {
-      final developers = <List<ExploreRepositoryEntity>>[];
+      final developers = <List<RepositoryModel>>[];
       final usernames = <String>{};
       var lookups = 0;
       Failure? rateLimitFailure;
@@ -73,7 +73,7 @@ class GetExploreDevelopersUseCase {
 
         final limit = rateLimitFailure;
         if (limit != null) {
-          return Left<Failure, List<List<ExploreRepositoryEntity>>>(limit);
+          return Left<Failure, List<List<RepositoryModel>>>(limit);
         }
 
         // Other per-user failures simply skip that developer.

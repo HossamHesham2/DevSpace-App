@@ -1,7 +1,7 @@
 import 'package:equatable/equatable.dart';
 
-class ExploreRepositoryEntity extends Equatable {
-  const ExploreRepositoryEntity({
+class RepositoryModel extends Equatable {
+  const RepositoryModel({
     required this.id,
     required this.name,
     required this.fullName,
@@ -60,4 +60,25 @@ class ExploreRepositoryEntity extends Equatable {
     ownerHtmlUrl,
     ownerType,
   ];
+  factory RepositoryModel.fromJson(Map<String, dynamic> json) {
+    final owner = json['owner'] as Map<String, dynamic>? ?? const {};
+
+    return RepositoryModel(
+      id: json['id'] as int? ?? 0,
+      name: json['name'] as String? ?? '',
+      fullName: json['full_name'] as String? ?? '',
+      description: json['description'] as String? ?? '',
+      htmlUrl: json['html_url'] as String? ?? '',
+      isPrivate: json['private'] as bool? ?? false,
+      isFork: json['fork'] as bool? ?? false,
+      isArchived: json['archived'] as bool? ?? false,
+      starsCount: json['stargazers_count'] as int? ?? 0,
+      forksCount: json['forks_count'] as int? ?? 0,
+      language: json['language'] as String?,
+      ownerUsername: owner['login'] as String? ?? '',
+      ownerAvatarUrl: owner['avatar_url'] as String? ?? '',
+      ownerHtmlUrl: owner['html_url'] as String? ?? '',
+      ownerType: owner['type'] as String? ?? '',
+    );
+  }
 }
